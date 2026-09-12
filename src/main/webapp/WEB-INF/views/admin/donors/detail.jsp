@@ -83,38 +83,7 @@
                     </div>
                 </div>
 
-                <div class="card mt-4">
-                    <div class="card-header">Status Management</div>
-                    <div class="card-body">
-                        <p class="text-muted mb-3">Current status: <strong>${donor.account.status}</strong></p>
-                        <div class="action-buttons">
-                            <c:if test="${donor.account.status != 'ACTIVE'}">
-                                <form method="post" action="<c:url value='/admin/donors/${donor.id}/status'/>"
-                                    onsubmit="return confirm('Activate this donor?')">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <input type="hidden" name="status" value="ACTIVE" />
-                                    <button type="submit" class="btn btn-success">Activate</button>
-                                </form>
-                            </c:if>
-                            <c:if test="${donor.account.status != 'SUSPENDED'}">
-                                <form method="post" action="<c:url value='/admin/donors/${donor.id}/status'/>"
-                                    onsubmit="return confirm('Suspend this donor? They will not be able to log in.')">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <input type="hidden" name="status" value="SUSPENDED" />
-                                    <button type="submit" class="btn btn-warning">Suspend</button>
-                                </form>
-                            </c:if>
-                            <c:if test="${donor.account.status != 'INACTIVE'}">
-                                <form method="post" action="<c:url value='/admin/donors/${donor.id}/status'/>"
-                                    onsubmit="return confirm('Deactivate this donor? This will mark their account as inactive.')">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <input type="hidden" name="status" value="INACTIVE" />
-                                    <button type="submit" class="btn btn-danger">Deactivate</button>
-                                </form>
-                            </c:if>
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="card mt-4">
                     <div class="card-header">NFC Card Management</div>

@@ -27,7 +27,7 @@
                                 <label for="name" class="form-label">Hospital Name <span
                                         class="required">*</span></label>
                                 <input type="text" id="name" name="name" value="${fn:escapeXml(hospitalCreateDTO.name)}"
-                                    class="form-control" placeholder="Yangon General Hospital" required />
+                                    class="form-control" required />
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -65,25 +65,21 @@
                                         value="${fn:escapeXml(hospitalCreateDTO.division)}" class="form-control" />
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="country" class="form-label">Country</label>
-                                <input type="text" id="country" name="country"
-                                    value="${fn:escapeXml(hospitalCreateDTO.country)}" class="form-control"
-                                    placeholder="Myanmar" />
-                            </div>
+                            <%-- Country is always Myanmar; not user-editable --%>
+                                <input type="hidden" name="country" value="Myanmar" />
 
-                            <hr class="form-divider" />
-                            <div class="form-group">
-                                <label for="profilePicture" class="form-label">Profile Picture</label>
-                                <input type="file" id="profilePicture" name="profilePicture" class="form-control-file"
-                                    accept="image/*" />
-                                <p class="text-muted text-sm mt-1">Upload Size: Max 10MB.</p>
-                            </div>
+                                <hr class="form-divider" />
+                                <div class="form-group">
+                                    <label for="profilePicture" class="form-label">Profile Picture</label>
+                                    <input type="file" id="profilePicture" name="profilePicture"
+                                        class="form-control-file" accept="image/*" />
+                                    <p class="text-muted text-sm mt-1">Upload Size: Max 10MB.</p>
+                                </div>
 
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Create Hospital</button>
-                                <a href="<c:url value='/admin/hospitals'/>" class="btn btn-secondary">Cancel</a>
-                            </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Create Hospital</button>
+                                    <a href="<c:url value='/admin/hospitals'/>" class="btn btn-secondary">Cancel</a>
+                                </div>
                         </form>
                     </div>
                 </div>

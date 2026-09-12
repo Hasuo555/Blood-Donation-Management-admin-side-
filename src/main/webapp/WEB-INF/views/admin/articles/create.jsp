@@ -26,8 +26,7 @@
                             <div class="form-group">
                                 <label for="title" class="form-label">Title <span class="required">*</span></label>
                                 <input type="text" id="title" name="title"
-                                    value="${fn:escapeXml(articleCreateDTO.title)}" class="form-control"
-                                    placeholder="Article title" required />
+                                    value="${fn:escapeXml(articleCreateDTO.title)}" class="form-control" required />
                             </div>
 
                             <div class="form-group">

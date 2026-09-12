@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
+
 @SpringBootApplication
 @ServletComponentScan(basePackages = "com.amyanhlu.admin.servlet")
 public class AMyanHluAdminApplication extends SpringBootServletInitializer {

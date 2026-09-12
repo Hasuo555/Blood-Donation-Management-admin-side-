@@ -2,10 +2,14 @@ package com.amyanhlu.admin.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "audit_logs")
 public class AuditLog {
+
+    private static final DateTimeFormatter YANGON_DISPLAY_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -113,5 +117,17 @@ public class AuditLog {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /** Formatted timestamp for the Admin UI in Asia/Yangon time. */
+    @Transient
+    public String getCreatedAtYangon() {
+        if (createdAt == null) {
+            return "—";
+        }
+        // With the existing UTC JDBC connection, MySQL timestamp values are
+        // materialized six hours thirty minutes ahead of the Yangon wall clock.
+        // Correct only this audit-log display value; do not change global time.
+        return createdAt.minusMinutes(390).format(YANGON_DISPLAY_FORMAT);
     }
 }

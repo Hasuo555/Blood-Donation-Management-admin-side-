@@ -46,6 +46,7 @@ public class DonorUpdateDTO {
     private String division;
 
     private String country;
+    private Long bloodTypeId;
 
     public String getName() {
         return name;
@@ -126,4 +127,7 @@ public class DonorUpdateDTO {
     public void setCountry(String country) {
         this.country = country;
     }
+
+    public Long getBloodTypeId() { return bloodTypeId; }
+    public void setBloodTypeId(Long bloodTypeId) { this.bloodTypeId = bloodTypeId; }
 }

@@ -52,7 +52,7 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
            "AND (:startDate IS NULL OR a.createdAt >= :startDate) " +
            "AND (:endDate IS NULL OR a.createdAt <= :endDate) " +
            "AND (:performer IS NULL OR LOWER(acc.email) LIKE :performer) " +
-           "ORDER BY a.createdAt DESC",
+           "ORDER BY a.createdAt DESC, a.id DESC",
            countQuery = "SELECT COUNT(a) FROM AuditLog a LEFT JOIN a.account acc WHERE " +
            "(:entityType IS NULL OR a.entityType = :entityType) " +
            "AND (:action IS NULL OR a.action = :action) " +
@@ -68,5 +68,5 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
 
     @EntityGraph(attributePaths = "account")
-    Page<AuditLog> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<AuditLog> findAllByOrderByCreatedAtDescIdDesc(Pageable pageable);
 }

@@ -51,37 +51,5 @@
     </div>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header">Status Management</div>
-    <div class="card-body">
-        <p class="text-muted mb-3">Current status: <strong>${staff.status}</strong></p>
-        <div class="action-buttons">
-            <c:if test="${staff.status != 'ACTIVE'}">
-                <form method="post" action="<c:url value='/admin/staff/${staff.id}/status'/>"
-                      onsubmit="return confirm('Activate this staff account?')">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <input type="hidden" name="status" value="ACTIVE"/>
-                    <button type="submit" class="btn btn-success">Activate</button>
-                </form>
-            </c:if>
-            <c:if test="${staff.status != 'SUSPENDED'}">
-                <form method="post" action="<c:url value='/admin/staff/${staff.id}/status'/>"
-                      onsubmit="return confirm('Suspend this staff account?')">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <input type="hidden" name="status" value="SUSPENDED"/>
-                    <button type="submit" class="btn btn-warning">Suspend</button>
-                </form>
-            </c:if>
-            <c:if test="${staff.status != 'INACTIVE'}">
-                <form method="post" action="<c:url value='/admin/staff/${staff.id}/status'/>"
-                      onsubmit="return confirm('Deactivate this staff account?')">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <input type="hidden" name="status" value="INACTIVE"/>
-                    <button type="submit" class="btn btn-danger">Deactivate</button>
-                </form>
-            </c:if>
-        </div>
-    </div>
-</div>
 
 <%@ include file="../../layout/footer.jsp" %>

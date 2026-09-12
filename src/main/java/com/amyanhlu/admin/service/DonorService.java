@@ -12,6 +12,7 @@ import com.amyanhlu.admin.enums.AccountStatus;
 import com.amyanhlu.admin.enums.Gender;
 import com.amyanhlu.admin.repository.AccountRepository;
 import com.amyanhlu.admin.repository.AddressRepository;
+import com.amyanhlu.admin.repository.BloodTypeRepository;
 import com.amyanhlu.admin.repository.DonorRepository;
 import com.amyanhlu.admin.repository.NrcDocumentRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -46,6 +47,7 @@ public class DonorService {
     private final R2StorageService r2StorageService;
     private final AddressRepository addressRepository;
     private final AccountRepository accountRepository;
+    private final BloodTypeRepository bloodTypeRepository;
     private final NrcDocumentRepository nrcDocumentRepository;
     private final NotificationService notificationService;
 
@@ -55,6 +57,7 @@ public class DonorService {
             R2StorageService r2StorageService,
             AddressRepository addressRepository,
             AccountRepository accountRepository,
+            BloodTypeRepository bloodTypeRepository,
             NrcDocumentRepository nrcDocumentRepository,
             NotificationService notificationService) {
         this.donorRepository = donorRepository;
@@ -63,6 +66,7 @@ public class DonorService {
         this.r2StorageService = r2StorageService;
         this.addressRepository = addressRepository;
         this.accountRepository = accountRepository;
+        this.bloodTypeRepository = bloodTypeRepository;
         this.nrcDocumentRepository = nrcDocumentRepository;
         this.notificationService = notificationService;
     }
@@ -278,6 +282,14 @@ public class DonorService {
         donor.setName(cleanName);
         donor.setDateOfBirth(dto.getDateOfBirth());
         donor.setGender(Gender.valueOf(gender));
+
+        // Blood type update (null = clear / unset)
+        if (dto.getBloodTypeId() != null) {
+            bloodTypeRepository.findById(dto.getBloodTypeId())
+                    .ifPresent(donor::setBloodType);
+        } else {
+            donor.setBloodType(null);
+        }
 
         Address address = donor.getAddress();
         if (address == null) {

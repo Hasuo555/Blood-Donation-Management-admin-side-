@@ -121,6 +121,7 @@ public class HospitalController {
     public String update(@PathVariable Long id,
             @Valid @ModelAttribute HospitalUpdateDTO dto,
             BindingResult result,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) MultipartFile profilePicture,
             @AuthenticationPrincipal AdminUserDetails principal,
             HttpServletRequest request,
@@ -136,6 +137,15 @@ public class HospitalController {
             hospitalService.update(id, dto.getName(), dto.getPhone(), dto.getEmail(),
                     dto.getDetailAddress(), dto.getCountry(), dto.getDivision(), dto.getTownship(),
                     principal.getAccount(), request);
+
+            // Apply status change inline if the admin changed the dropdown
+            if (status != null && !status.isBlank()) {
+                Hospital current = hospitalService.findById(id);
+                HospitalStatus selected = HospitalStatus.valueOf(status);
+                if (current.getStatus() != selected) {
+                    hospitalService.changeStatus(id, selected, principal.getAccount(), request);
+                }
+            }
 
             if (storageService.hasContent(profilePicture)) {
                 try {

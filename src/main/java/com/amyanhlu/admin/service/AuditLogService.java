@@ -80,7 +80,7 @@ public class AuditLogService {
 
     @Transactional(readOnly = true)
     public Page<AuditLog> findAll(Pageable pageable) {
-        return auditLogRepository.findAllByOrderByCreatedAtDesc(pageable);
+        return auditLogRepository.findAllByOrderByCreatedAtDescIdDesc(pageable);
     }
 
     @Transactional(readOnly = true)

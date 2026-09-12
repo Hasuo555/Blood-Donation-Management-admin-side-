@@ -66,6 +66,16 @@
                 </select>
             </div>
 
+            <div class="form-group">
+                <label for="bloodTypeId" class="form-label">Blood Type</label>
+                <select id="bloodTypeId" name="bloodTypeId" class="form-control">
+                    <option value="">— Unknown / Clear —</option>
+                    <c:forEach items="${bloodTypes}" var="bt">
+                        <option value="${bt.id}" ${donorUpdateDTO.bloodTypeId == bt.id ? 'selected' : ''}>${fn:escapeXml(bt.displayName)}</option>
+                    </c:forEach>
+                </select>
+            </div>
+
             <hr class="form-divider"/>
             <h3 class="form-section-title">Address</h3>
             <div class="form-group">
@@ -86,12 +96,8 @@
                            value="${fn:escapeXml(donorUpdateDTO.division)}" class="form-control" required/>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="country" class="form-label">Country</label>
-                <input type="text" id="country" name="country"
-                       value="${fn:escapeXml(donorUpdateDTO.country)}"
-                       class="form-control" placeholder="Myanmar"/>
-            </div>
+            <%-- Country is always Myanmar; not user-editable --%>
+            <input type="hidden" name="country" value="Myanmar" />
 
             <div class="form-actions">
                 <a href="<c:url value='/admin/donors/${donor.id}'/>" class="btn btn-secondary">Cancel</a>

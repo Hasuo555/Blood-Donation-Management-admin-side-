@@ -68,6 +68,7 @@ public class DonorController {
         model.addAttribute("donor", donor);
         model.addAttribute("donorUpdateDTO", toDto(donor));
         model.addAttribute("accountStatuses", AccountStatus.values());
+        model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
         return "admin/donors/edit";
     }
 
@@ -84,6 +85,7 @@ public class DonorController {
             model.addAttribute("donor", donorService.findById(id));
             model.addAttribute("donorUpdateDTO", donorUpdateDTO);
             model.addAttribute("accountStatuses", AccountStatus.values());
+            model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
             return "admin/donors/edit";
         }
         try {
@@ -97,6 +99,7 @@ public class DonorController {
             model.addAttribute("donor", donorService.findById(id));
             model.addAttribute("donorUpdateDTO", donorUpdateDTO);
             model.addAttribute("accountStatuses", AccountStatus.values());
+            model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
             return "admin/donors/edit";
         }
     }
@@ -159,6 +162,9 @@ public class DonorController {
             dto.setTownship(donor.getAddress().getTownship());
             dto.setDivision(donor.getAddress().getDivision());
             dto.setCountry(donor.getAddress().getCountry());
+        }
+        if (donor.getBloodType() != null) {
+            dto.setBloodTypeId(donor.getBloodType().getId());
         }
         return dto;
     }

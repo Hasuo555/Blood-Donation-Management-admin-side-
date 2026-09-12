@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.time.ZoneId;
+import java.time.LocalDateTime;
 
 /**
  * JDBC insert-only audit log DAO.
@@ -49,8 +51,8 @@ public class AuditLogDAO {
     public void insert(Long accountId, String action, String entityType, long entityId,
                        String oldValueJson, String newValueJson, String ipAddress) {
         String sql = """
-                INSERT INTO audit_logs (account_id, action, entity_type, entity_id, old_value, new_value, ip_address)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO audit_logs (account_id, action, entity_type, entity_id, old_value, new_value, ip_address, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(sql,
                 accountId,
@@ -59,7 +61,10 @@ public class AuditLogDAO {
                 entityId,
                 normalizeJson(oldValueJson),
                 normalizeJson(newValueJson),
-                ipAddress);
+                ipAddress,
+                // Bind the local wall-clock value directly, matching Hibernate's
+                // notification timestamp behavior and avoiding Timestamp/UTC re-interpretation.
+                LocalDateTime.now(ZoneId.of("Asia/Yangon")));
     }
 
     /**

@@ -60,37 +60,5 @@
     </div>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header">Status Management</div>
-    <div class="card-body">
-        <p class="text-muted mb-3">Current status: <strong>${hospital.status}</strong></p>
-        <div class="action-buttons">
-            <c:if test="${hospital.status != 'ACTIVE'}">
-                <form method="post" action="<c:url value='/admin/hospitals/${hospital.id}/status'/>"
-                      onsubmit="return confirm('Activate this hospital?')">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <input type="hidden" name="status" value="ACTIVE"/>
-                    <button type="submit" class="btn btn-success">Activate</button>
-                </form>
-            </c:if>
-            <c:if test="${hospital.status != 'SUSPENDED'}">
-                <form method="post" action="<c:url value='/admin/hospitals/${hospital.id}/status'/>"
-                      onsubmit="return confirm('Suspend this hospital?')">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <input type="hidden" name="status" value="SUSPENDED"/>
-                    <button type="submit" class="btn btn-warning">Suspend</button>
-                </form>
-            </c:if>
-            <c:if test="${hospital.status != 'INACTIVE'}">
-                <form method="post" action="<c:url value='/admin/hospitals/${hospital.id}/status'/>"
-                      onsubmit="return confirm('Deactivate this hospital?')">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <input type="hidden" name="status" value="INACTIVE"/>
-                    <button type="submit" class="btn btn-danger">Deactivate</button>
-                </form>
-            </c:if>
-        </div>
-    </div>
-</div>
 
 <%@ include file="../../layout/footer.jsp" %>

@@ -64,13 +64,19 @@
                            value="${fn:escapeXml(hospitalUpdateDTO.division)}" class="form-control"/>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="country" class="form-label">Country</label>
-                <input type="text" id="country" name="country"
-                       value="${fn:escapeXml(hospitalUpdateDTO.country)}" class="form-control"/>
-            </div>
+            <%-- Country is always Myanmar; not user-editable --%>
+            <input type="hidden" name="country" value="Myanmar" />
 
             <hr class="form-divider"/>
+            <h3 class="form-section-title">Status</h3>
+            <div class="form-group">
+                <label for="status" class="form-label">Hospital Status <span class="required">*</span></label>
+                <select id="status" name="status" class="form-control" required>
+                    <option value="ACTIVE"    ${hospital.status == 'ACTIVE'    ? 'selected' : ''}>Active</option>
+                    <option value="INACTIVE"  ${hospital.status == 'INACTIVE'  ? 'selected' : ''}>Inactive</option>
+                    <option value="SUSPENDED" ${hospital.status == 'SUSPENDED' ? 'selected' : ''}>Suspended</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label for="profilePicture" class="form-label">Update Profile Picture</label>
                 <c:if test="${not empty hospital.profilePicture}">
