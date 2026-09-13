@@ -165,7 +165,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
     (() => {
-        const colors = ['#dc2626', '#2563eb', '#16a34a', '#f59e0b', '#7c3aed', '#0891b2', '#db2777', '#64748b'];
+        const colors = ['#880808', '#a00a0a', '#2e7d32', '#d97706', '#0288d1', '#8b5cf6', '#d32f2f', '#667085'];
         const charts = {};
         const state = { locations: { townships: [], hospitals: [] } };
         if (typeof Chart === 'undefined') {
@@ -324,7 +324,7 @@
                         type: 'bar',
                         data: {labels, datasets: [{
                             label: 'Donated units', data: values,
-                            backgroundColor: labels.map((_, index) => 'rgba(79, 70, 229, ' + Math.max(.45, 1 - index * .035) + ')'),
+                            backgroundColor: labels.map((_, index) => 'rgba(136, 8, 8, ' + Math.max(.45, 1 - index * .035) + ')'),
                             borderRadius: 5, borderSkipped: false, barPercentage: .72, categoryPercentage: .82
                         }]},
                         options: {
@@ -378,7 +378,7 @@
         function loadAnnual() {
             return json('<c:url value="/admin/api/analytics/annual-donations" />')
                 .then(data => replaceChart('annual', 'annualChart', {
-                    type: 'line', data: {labels: data.labels, datasets: [{label: 'Donated units', data: data.values, borderColor: '#0d9488', backgroundColor: 'rgba(13,148,136,.12)', fill: true, tension: .3}]}, options: baseOptions
+                    type: 'line', data: {labels: data.labels, datasets: [{label: 'Donated units', data: data.values, borderColor: '#880808', backgroundColor: 'rgba(136,8,8,.12)', fill: true, tension: .3}]}, options: baseOptions
                 }));
         }
 

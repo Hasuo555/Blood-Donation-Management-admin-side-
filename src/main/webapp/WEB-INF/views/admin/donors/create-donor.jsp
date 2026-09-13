@@ -159,6 +159,11 @@
               background: rgba(229, 62, 62, .04);
             }
 
+            .file-upload-area.is-dragover {
+              border-color: #e53e3e;
+              background: rgba(229, 62, 62, .08);
+            }
+
             .file-upload-area input[type="file"] {
               position: absolute;
               inset: 0;
@@ -466,6 +471,165 @@
               gap: .75rem;
               justify-content: flex-end;
             }
+
+            /* Keep the donor workflow aligned with the shared light admin theme. */
+            .form-section {
+              background: #fff !important;
+              border-color: #e7e9ee !important;
+              box-shadow: 0 4px 12px rgba(16, 24, 40, .05);
+            }
+
+            .form-section-header {
+              background: #fffafa !important;
+              border-color: #f0dddd !important;
+            }
+
+            .form-section-header .section-icon {
+              background: #fbe8e8 !important;
+            }
+
+            .form-section-header .section-icon svg {
+              fill: #880808 !important;
+            }
+
+            .form-section-header h3,
+            .field-input,
+            .field-select {
+              color: #1f2937 !important;
+            }
+
+            .field-label,
+            .field-label .opt,
+            .file-upload-label {
+              color: #667085 !important;
+            }
+
+            .field-label .req,
+            .file-upload-label span {
+              color: #880808 !important;
+            }
+
+            .field-input,
+            .field-select {
+              background: #fff !important;
+              border-color: #e1caca !important;
+            }
+
+            .field-input:focus,
+            .field-select:focus {
+              border-color: #880808 !important;
+              box-shadow: 0 0 0 3px rgba(136, 8, 8, .12) !important;
+            }
+
+            .field-select option {
+              background: #fff !important;
+              color: #1f2937 !important;
+            }
+
+            .file-upload-area {
+              border-color: #e1caca !important;
+              background: #fffafa;
+            }
+
+            .file-upload-area:hover {
+              border-color: #880808 !important;
+              background: #fff5f5 !important;
+            }
+
+            .file-upload-label span,
+            .file-preview {
+              color: #880808 !important;
+            }
+
+            .form-actions-bar {
+              background: #fffafa !important;
+              border-color: #f0dddd !important;
+            }
+
+            .btn-create {
+              background: linear-gradient(135deg, #a00a0a, #880808) !important;
+              box-shadow: 0 3px 8px rgba(136, 8, 8, .18);
+            }
+
+            .btn-cancel {
+              color: #667085 !important;
+              border-color: #e1caca !important;
+            }
+
+            .btn-cancel:hover {
+              border-color: #880808 !important;
+              color: #880808 !important;
+            }
+
+            .cred-modal {
+              background: #fff !important;
+              border-color: #f0dddd !important;
+              box-shadow: 0 25px 60px rgba(16, 24, 40, .22) !important;
+            }
+
+            .cred-modal-header {
+              background: linear-gradient(135deg, #fff1f1, #fffafa) !important;
+              border-color: #f0dddd !important;
+            }
+
+            .cred-modal-title {
+              color: #1f2937 !important;
+            }
+
+            .cred-modal-subtitle,
+            .cred-label {
+              color: #667085 !important;
+            }
+
+            .cred-value-box {
+              background: #fffafa !important;
+              border-color: #e1caca !important;
+            }
+
+            .cred-value {
+              color: #2e7d32 !important;
+            }
+
+            .cred-modal-footer {
+              border-color: #f0dddd !important;
+            }
+
+            .file-preview-image {
+              display: block;
+              max-width: 100%;
+              max-height: 120px;
+              object-fit: contain;
+              margin: 8px auto 0;
+              border-radius: 6px;
+              background: #fff;
+            }
+
+            .file-clear-button {
+              position: absolute;
+              top: 8px;
+              right: 8px;
+              z-index: 3;
+              width: 26px;
+              height: 26px;
+              border: 1px solid #e1caca;
+              border-radius: 50%;
+              background: #fff;
+              color: #880808;
+              font-size: 1rem;
+              line-height: 1;
+              cursor: pointer;
+              box-shadow: 0 2px 6px rgba(16, 24, 40, .12);
+            }
+
+            .file-clear-button:hover {
+              background: #fff1f1;
+            }
+
+            .file-upload-area.has-preview .file-upload-icon,
+            .file-upload-area.has-preview .file-upload-label,
+            .file-upload-area.has-preview .file-preview {
+              display: none;
+            }
           </style>
 
           <%--============================================================Page
@@ -678,12 +842,16 @@
                                       <input type="file" id="nrcFront" name="nrcFront"
                                         accept="image/jpeg,image/png,image/webp"
                                         onchange="handleFileSelect(this, 'nrcFrontArea', 'nrcFrontPreview')" />
+                                      <button type="button" class="file-clear-button" id="nrcFrontClear"
+                                        aria-label="Clear NRC front photo" title="Clear photo" hidden
+                                        onclick="clearFilePreview('nrcFront', 'nrcFrontArea', 'nrcFrontPreview')">×</button>
                                       <div class="file-upload-icon">🪪</div>
                                       <span class="file-upload-label">
                                         <span>Click to upload</span> or drag & drop<br>
                                         JPEG · PNG · WebP — max 5 MB
                                       </span>
                                       <span class="file-preview" id="nrcFrontPreview"></span>
+                                      <img class="file-preview-image" id="nrcFrontPreviewImage" hidden />
                                     </div>
                                     <c:if test="${not empty fieldErrors.nrcFront}"><span
                                         class="field-error">${fn:escapeXml(fieldErrors.nrcFront)}</span></c:if>
@@ -697,12 +865,16 @@
                                       <input type="file" id="nrcBack" name="nrcBack"
                                         accept="image/jpeg,image/png,image/webp"
                                         onchange="handleFileSelect(this, 'nrcBackArea', 'nrcBackPreview')" />
-                                      <div class="file-upload-icon">🔄</div>
+                                      <button type="button" class="file-clear-button" id="nrcBackClear"
+                                        aria-label="Clear NRC back photo" title="Clear photo" hidden
+                                        onclick="clearFilePreview('nrcBack', 'nrcBackArea', 'nrcBackPreview')">×</button>
+                                      <div class="file-upload-icon">🪪</div>
                                       <span class="file-upload-label">
                                         <span>Click to upload</span> or drag & drop<br>
                                         JPEG · PNG · WebP — max 5 MB
                                       </span>
                                       <span class="file-preview" id="nrcBackPreview"></span>
+                                      <img class="file-preview-image" id="nrcBackPreviewImage" hidden />
                                     </div>
                                     <c:if test="${not empty fieldErrors.nrcBack}"><span
                                         class="field-error">${fn:escapeXml(fieldErrors.nrcBack)}</span></c:if>
@@ -800,7 +972,7 @@
                                       <div class="field-group">
                                         <label class="field-label" for="confirmPassword">Confirm Password</label>
                                         <input id="confirmPassword" name="confirmPassword" type="password"
-                                          class="field-input" placeholder="Repeat password"
+                                          class="field-input" placeholder="Reenter password"
                                           autocomplete="new-password" />
                                       </div>
                                     </div>
@@ -826,7 +998,7 @@
                     <%--============================================================JavaScript============================================================--%>
                       <script>
                         // ── File picker feedback ─────────────────────────────────────
-                        function handleFileSelect(input, areaId, previewId) {
+                        function handleFileSelectLegacy(input, areaId, previewId) {
                           const area = document.getElementById(areaId);
                           const preview = document.getElementById(previewId);
                           const file = input.files[0];
@@ -859,6 +1031,88 @@
                         }
 
                         // ── Submit feedback ──────────────────────────────────────────
+                        // Replace filename-only feedback with an instant image preview.
+                        function handleFileSelect(input, areaId, previewId) {
+                          const area = document.getElementById(areaId);
+                          const preview = document.getElementById(previewId);
+                          const image = document.getElementById(input.id + 'PreviewImage');
+                          const clearButton = document.getElementById(input.id + 'Clear');
+                          const file = input.files[0];
+                          const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+                          const maxSize = 5 * 1024 * 1024;
+
+                          if (!file) {
+                            clearFilePreview(input.id, areaId, previewId);
+                            return;
+                          }
+                          if (!allowed.includes(file.type)) {
+                            area.classList.add('is-error');
+                            image.hidden = true;
+                            preview.textContent = 'Invalid type. Use JPEG, PNG, or WebP.';
+                            preview.style.color = '#fc8181';
+                            preview.style.display = 'block';
+                            input.value = '';
+                            return;
+                          }
+                          if (file.size > maxSize) {
+                            area.classList.add('is-error');
+                            image.hidden = true;
+                            preview.textContent = 'File too large (max 5 MB).';
+                            preview.style.color = '#fc8181';
+                            preview.style.display = 'block';
+                            input.value = '';
+                            return;
+                          }
+
+                          const reader = new FileReader();
+                          reader.onload = function (event) {
+                            image.src = event.target.result;
+                            image.hidden = false;
+                            clearButton.hidden = false;
+                            area.classList.remove('is-error');
+                            area.classList.add('has-preview');
+                            preview.textContent = file.name;
+                            preview.style.color = '#880808';
+                            preview.style.display = 'block';
+                          };
+                          reader.readAsDataURL(file);
+                        }
+
+                        function clearFilePreview(inputId, areaId, previewId) {
+                          const input = document.getElementById(inputId);
+                          const area = document.getElementById(areaId);
+                          const preview = document.getElementById(previewId);
+                          const image = document.getElementById(inputId + 'PreviewImage');
+                          const clearButton = document.getElementById(inputId + 'Clear');
+                          input.value = '';
+                          image.src = '';
+                          image.hidden = true;
+                          clearButton.hidden = true;
+                          preview.textContent = '';
+                          preview.style.display = 'none';
+                          area.classList.remove('has-preview', 'is-error');
+                        }
+
+                        ['nrcFrontArea', 'nrcBackArea'].forEach(function (areaId) {
+                          const area = document.getElementById(areaId);
+                          const input = area.querySelector('input[type="file"]');
+                          area.addEventListener('dragover', function (event) {
+                            event.preventDefault();
+                            area.classList.add('is-dragover');
+                          });
+                          area.addEventListener('dragleave', function () {
+                            area.classList.remove('is-dragover');
+                          });
+                          area.addEventListener('drop', function (event) {
+                            event.preventDefault();
+                            area.classList.remove('is-dragover');
+                            if (event.dataTransfer.files.length) {
+                              input.files = event.dataTransfer.files;
+                              handleFileSelect(input, areaId, input.id + 'Preview');
+                            }
+                          });
+                        });
+
                         document.getElementById('createDonorForm').addEventListener('submit', function () {
                           const btn = document.getElementById('submitBtn');
                           btn.disabled = true;

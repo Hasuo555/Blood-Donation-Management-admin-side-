@@ -10,8 +10,8 @@
                     <div class="pagination-container"
                         style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb;">
                         <div class="pagination-info text-muted text-sm">
-                            Showing page <strong>${p.number + 1}</strong> of <strong>${p.totalPages}</strong>
-                            (${p.totalElements} total entries)
+
+                            ${p.totalElements} total entries
                         </div>
 
                         <ul class="pagination-links"

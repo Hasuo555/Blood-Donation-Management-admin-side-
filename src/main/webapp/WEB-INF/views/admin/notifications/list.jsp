@@ -45,7 +45,7 @@
                             <td><span class="badge badge-gray">${fn:escapeXml(n.type)}</span></td>
                             <td class="text-sm">${fn:escapeXml(n.account.email)}</td>
                             <td class="text-sm">${fn:escapeXml(fn:substring(n.message, 0, 80))}${fn:length(n.message) > 80 ? '…' : ''}</td>
-                            <td class="text-muted text-sm">${n.createdAt}</td>
+                            <td class="text-muted text-sm text-nowrap">${n.createdAt != null ? n.createdAt.format(adminDateTimeFormatter) : '—'}</td>
                         </tr>
                         </c:forEach>
                     </tbody>

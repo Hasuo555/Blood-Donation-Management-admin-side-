@@ -73,11 +73,10 @@
                                     <%-- Row 3: Performer --%>
                                         <div class="form-row form-row--1">
                                             <div class="form-group">
-                                                <label class="form-label" for="filter-performer">User / Admin
+                                                <label class="form-label" for="filter-performer">
                                                     Email</label>
                                                 <input id="filter-performer" type="text" name="performer"
-                                                    class="form-control" placeholder="e.g. admin@amyanhlu.org"
-                                                    value="${fn:escapeXml(performer)}" />
+                                                    class="form-control" value="${fn:escapeXml(performer)}" />
                                             </div>
                                         </div>
                                         <div class="form-actions">
@@ -106,20 +105,22 @@
                                             <th>Account</th>
                                             <th>Action</th>
                                             <th>Entity Type</th>
-                                            <th>Entity ID</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <c:forEach items="${logPage.content}" var="log">
                                             <tr>
                                                 <td>${log.id}</td>
-                                                <td class="text-sm text-muted text-nowrap">${log.createdAtYangon}</td>
+                                                <td class="text-sm text-muted text-nowrap">${log.createdAt != null ?
+                                                    log.createdAt.minusMinutes(390).format(adminDateTimeFormatter) :
+                                                    '—'}</td>
                                                 <td class="text-sm">${log.account != null ?
                                                     fn:escapeXml(log.account.email) : '—'}</td>
                                                 <td><span class="badge badge-action">${fn:escapeXml(log.action)}</span>
                                                 </td>
                                                 <td class="text-sm">${fn:escapeXml(log.entityType)}</td>
-                                                <td>${log.entityId}</td>
+
                                             </tr>
                                         </c:forEach>
                                     </tbody>

@@ -2,186 +2,185 @@
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
             <%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
-            <c:set var="pageTitle" value="Donors — Detail" scope="request" />
-            <%@ include file="../../layout/header.jsp" %>
+                <c:set var="pageTitle" value="Donors — Detail" scope="request" />
+                <%@ include file="../../layout/header.jsp" %>
 
-                <div class="page-header">
-                    <div>
-                        <h1 class="page-title">${fn:escapeXml(donor.name)}</h1>
-                        <p class="page-subtitle">Donor Profile</p>
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">${fn:escapeXml(donor.name)}</h1>
+                            <p class="page-subtitle">Donor Profile</p>
+                        </div>
+                        <a href="<c:url value='/admin/donors/${donor.id}/edit'/>" class="btn btn-primary">Edit / Update
+                            Donor</a>
+                        <a href="<c:url value='/admin/donors'/>" class="btn btn-secondary">← Back to Donors</a>
                     </div>
-                    <a href="<c:url value='/admin/donors/${donor.id}/edit'/>" class="btn btn-primary">Edit / Update
-                        Donor</a>
-                    <a href="<c:url value='/admin/donors'/>" class="btn btn-secondary">← Back to Donors</a>
-                </div>
 
-                <c:if test="${not empty successMessage}">
-                    <div class="alert alert-success">${fn:escapeXml(successMessage)}</div>
-                </c:if>
-                <c:if test="${not empty errorMessage}">
-                    <div class="alert alert-error">${fn:escapeXml(errorMessage)}</div>
-                </c:if>
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">${fn:escapeXml(successMessage)}</div>
+                    </c:if>
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-error">${fn:escapeXml(errorMessage)}</div>
+                    </c:if>
 
-                <div class="detail-grid">
-                    <div class="card">
-                        <div class="card-header">Account Information</div>
-                        <div class="card-body">
-                            <dl class="detail-list">
-                                <dt>Email</dt>
-                                <dd>${fn:escapeXml(donor.account.email)}</dd>
-                                <dt>Phone</dt>
-                                <dd>${fn:escapeXml(donor.account.phone)}</dd>
-                                <dt>Account Status</dt>
-                                <dd><span
-                                        class="badge badge-status badge-status--${fn:toLowerCase(donor.account.status.toString())}">${donor.account.status}</span>
-                                </dd>
-                                <dt>Role</dt>
-                                <dd>${donor.account.role}</dd>
-                                <dt>Last Login</dt>
-                                <dd>${donor.account.lastLoginAt != null ? donor.account.lastLoginAt : '—'}</dd>
-                                <dt>Registered</dt>
-                                <dd>${donor.account.createdAt != null ? donor.account.createdAt.toLocalDate() : '—'}
-                                </dd>
-                            </dl>
+                    <div class="detail-grid">
+                        <div class="card">
+                            <div class="card-header">Personal Info</div>
+                            <div class="card-body">
+                                <dl class="detail-list">
+                                    <dt>Email</dt>
+                                    <dd>${fn:escapeXml(donor.account.email)}</dd>
+                                    <dt>Phone</dt>
+                                    <dd>${fn:escapeXml(donor.account.phone)}</dd>
+                                    <dt>Account Status</dt>
+                                    <dd><span
+                                            class="badge badge-status badge-status--${fn:toLowerCase(donor.account.status.toString())}">${donor.account.status}</span>
+                                    </dd>
+
+                                    <dt>Last Login</dt>
+                                    <dd>${donor.account.lastLoginAt != null ? donor.account.lastLoginAt.format(adminDateTimeFormatter) : '—'}</dd>
+                                    <dt>Registered</dt>
+                                    <dd>${donor.account.createdAt != null ? donor.account.createdAt.format(adminDateTimeFormatter) : '—'}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">Medical &amp; Blood Group</div>
+                            <div class="card-body">
+                                <dl class="detail-list">
+                                    <dt>Full Name</dt>
+                                    <dd>${fn:escapeXml(donor.name)}</dd>
+                                    <dt>Date of Birth</dt>
+                                    <dd>${donor.dateOfBirth != null ? donor.dateOfBirth : '—'}</dd>
+                                    <dt>Gender</dt>
+                                    <dd>${donor.gender != null ? donor.gender : '—'}</dd>
+                                    <dt>Blood Type</dt>
+                                    <dd>
+                                        <c:choose>
+                                            <c:when test="${donor.bloodType != null}">
+                                                <span class="badge badge-blood">${donor.bloodType.displayName}</span>
+                                                <c:if test="${donor.bloodTypeVerified}">
+                                                    <span class="badge badge-success ml-1">Verified</span>
+                                                </c:if>
+                                            </c:when>
+                                            <c:otherwise><span class="text-muted">Not set</span></c:otherwise>
+                                        </c:choose>
+                                    </dd>
+                                    <dt>Address</dt>
+                                    <dd>
+                                        <c:choose>
+                                            <c:when test="${donor.address != null}">
+                                                ${fn:escapeXml(donor.address.detailAddress)},
+                                                ${fn:escapeXml(donor.address.township)},
+                                                ${fn:escapeXml(donor.address.division)}
+                                            </c:when>
+                                            <c:otherwise><span class="text-muted">—</span></c:otherwise>
+                                        </c:choose>
+                                    </dd>
+                                </dl>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header">Donor Profile</div>
+                    <div class="card mt-4">
+                        <div class="card-header">NRC Documents</div>
                         <div class="card-body">
-                            <dl class="detail-list">
-                                <dt>Full Name</dt>
-                                <dd>${fn:escapeXml(donor.name)}</dd>
-                                <dt>Date of Birth</dt>
-                                <dd>${donor.dateOfBirth != null ? donor.dateOfBirth : '—'}</dd>
-                                <dt>Gender</dt>
-                                <dd>${donor.gender != null ? donor.gender : '—'}</dd>
-                                <dt>Blood Type</dt>
-                                <dd>
-                                    <c:choose>
-                                        <c:when test="${donor.bloodType != null}">
-                                            <span class="badge badge-blood">${donor.bloodType.displayName}</span>
-                                            <c:if test="${donor.bloodTypeVerified}">
-                                                <span class="badge badge-success ml-1">Verified</span>
-                                            </c:if>
-                                        </c:when>
-                                        <c:otherwise><span class="text-muted">Not set</span></c:otherwise>
-                                    </c:choose>
-                                </dd>
-                                <dt>Address</dt>
-                                <dd>
-                                    <c:choose>
-                                        <c:when test="${donor.address != null}">
-                                            ${fn:escapeXml(donor.address.detailAddress)},
-                                            ${fn:escapeXml(donor.address.township)},
-                                            ${fn:escapeXml(donor.address.division)}
-                                        </c:when>
-                                        <c:otherwise><span class="text-muted">—</span></c:otherwise>
-                                    </c:choose>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">NRC Verification</div>
-                    <div class="card-body">
-                        <c:choose>
-                            <c:when test="${not empty nrcDocument and not empty nrcDocument.frontImage}">
-                                <div class="detail-grid">
-                                    <div>
-                                        <p class="text-muted text-sm">NRC Photo</p>
-                                        <img src="<asset:asset-url value="${nrcDocument.frontImage}"/>"
-                                             alt="NRC photo" class="preview-image"
-                                             style="max-width:320px; max-height:240px; object-fit:contain;"/>
-                                    </div>
-                                    <c:if test="${not empty nrcDocument.backImage}">
-                                        <div>
-                                            <p class="text-muted text-sm">NRC Back Photo</p>
-                                            <img src="<asset:asset-url value="${nrcDocument.backImage}"/>"
-                                                 alt="NRC back photo" class="preview-image"
-                                                 style="max-width:320px; max-height:240px; object-fit:contain;"/>
+                            <c:choose>
+                                <c:when test="${not empty nrcDocument and not empty nrcDocument.frontImage}">
+                                    <div class="nrc-gallery">
+                                        <div class="nrc-tile">
+                                            <span class="nrc-tile-label">NRC Front</span>
+                                            <img src="<asset:asset-url value=" ${nrcDocument.frontImage}" />"
+                                            alt="NRC photo" class="preview-image"
+                                            />
                                         </div>
-                                    </c:if>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="badge badge-status badge-status--inactive">No NRC Photo Uploaded</span>
-                            </c:otherwise>
-                        </c:choose>
+                                        <c:if test="${not empty nrcDocument.backImage}">
+                                            <div class="nrc-tile">
+                                                <span class="nrc-tile-label">NRC Back</span>
+                                                <img src="<asset:asset-url value=" ${nrcDocument.backImage}" />"
+                                                alt="NRC back photo" class="preview-image"
+                                                />
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge badge-status badge-status--inactive">No NRC Photo Uploaded</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
-                </div>
 
 
 
-                <div class="card mt-4">
-                    <div class="card-header">NFC Card Management</div>
-                    <div class="card-body">
+                    <div class="card mt-4">
+                        <div class="card-header">NFC Card Management</div>
+                        <div class="card-body">
 
-                        <c:choose>
-                            <c:when test="${empty nfcCards}">
-                                <div class="empty-state">
-                                    <p>No NFC cards are linked to this donor.</p>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Card Identifier</th>
-                                            <th>Issued By</th>
-                                            <th>Issue Date</th>
-                                            <th>Expiry Date</th>
-                                            <th>Card Status</th>
-                                            <th>Update Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach items="${nfcCards}" var="card">
+                            <c:choose>
+                                <c:when test="${empty nfcCards}">
+                                    <div class="empty-state">
+                                        <p>No NFC cards are linked to this donor.</p>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <table class="data-table">
+                                        <thead>
                                             <tr>
-                                                <td><strong>${fn:escapeXml(card.cardUid)}</strong></td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${card.issuedByHospital != null}">
-                                                            ${fn:escapeXml(card.issuedByHospital.name)}
-                                                        </c:when>
-                                                        <c:otherwise>—</c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td class="text-muted text-sm">
-                                                    ${card.issuedAt != null ? card.issuedAt.toLocalDate() : '—'}
-                                                </td>
-                                                <td class="text-muted text-sm">
-                                                    ${card.validUntil != null ? card.validUntil : '—'}
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge badge-status badge-status--${fn:toLowerCase(card.status.toString())}">${card.status}</span>
-                                                </td>
-                                                <td>
-                                                    <form method="post"
-                                                        action="<c:url value='/admin/donors/${donor.id}/nfc-cards/${card.id}/status'/>"
-                                                        class="nfc-status-form">
-                                                        <input type="hidden" name="${_csrf.parameterName}"
-                                                            value="${_csrf.token}" />
-                                                        <select name="status" class="form-control form-control-sm">
-                                                            <c:forEach items="${nfcStatuses}" var="st">
-                                                                <option value="${st}" ${card.status==st ? 'selected'
-                                                                    : '' }>${st}</option>
-                                                            </c:forEach>
-                                                        </select>
-                                                        <button type="submit"
-                                                            class="btn btn-sm btn-primary">Update</button>
-                                                    </form>
-                                                </td>
+                                                <th>Card Identifier</th>
+                                                <th>Issued By</th>
+                                                <th>Issue Date</th>
+                                                <th>Expiry Date</th>
+                                                <th>Card Status</th>
+                                                <th>Update Status</th>
                                             </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                            </c:otherwise>
-                        </c:choose>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach items="${nfcCards}" var="card">
+                                                <tr>
+                                                    <td><strong>${fn:escapeXml(card.cardUid)}</strong></td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${card.issuedByHospital != null}">
+                                                                ${fn:escapeXml(card.issuedByHospital.name)}
+                                                            </c:when>
+                                                            <c:otherwise>—</c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td class="text-muted text-sm text-nowrap">
+                                                        ${card.issuedAt != null ? card.issuedAt.format(adminDateTimeFormatter) : '—'}
+                                                    </td>
+                                                    <td class="text-muted text-sm text-nowrap">
+                                                        ${card.validUntil != null ? card.validUntil : '—'}
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge badge-status badge-status--${fn:toLowerCase(card.status.toString())}">${card.status}</span>
+                                                    </td>
+                                                    <td>
+                                                        <form method="post"
+                                                            action="<c:url value='/admin/donors/${donor.id}/nfc-cards/${card.id}/status'/>"
+                                                            class="nfc-status-form">
+                                                            <input type="hidden" name="${_csrf.parameterName}"
+                                                                value="${_csrf.token}" />
+                                                            <select name="status" class="form-control form-control-sm">
+                                                                <c:forEach items="${nfcStatuses}" var="st">
+                                                                    <option value="${st}" ${card.status==st ? 'selected'
+                                                                        : '' }>${st}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                            <button type="submit"
+                                                                class="btn btn-sm btn-primary">Update</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
-                </div>
 
-                <%@ include file="../../layout/footer.jsp" %>
+                    <%@ include file="../../layout/footer.jsp" %>

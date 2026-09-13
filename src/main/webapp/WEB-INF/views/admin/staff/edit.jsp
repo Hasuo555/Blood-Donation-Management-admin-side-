@@ -21,6 +21,7 @@
     <div class="card-body">
         <form method="post" action="<c:url value='/admin/staff/${staff.id}/edit'/>" novalidate>
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <div class="form-section-heading">Personal Info</div>
             <div class="form-group">
                 <label for="name" class="form-label">Full Name <span class="required">*</span></label>
                 <input type="text" id="name" name="name" value="${fn:escapeXml(staffUpdateDTO.name)}"
@@ -38,6 +39,7 @@
                            class="form-control" maxlength="20" required/>
                 </div>
             </div>
+            <div class="form-section-heading">Staff Assignment</div>
             <div class="form-group">
                 <label for="hospitalId" class="form-label">Assigned Hospital <span class="required">*</span></label>
                 <select id="hospitalId" name="hospitalId" class="form-control" required>

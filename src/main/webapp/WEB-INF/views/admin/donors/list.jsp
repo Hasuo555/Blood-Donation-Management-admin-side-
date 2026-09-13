@@ -79,13 +79,25 @@
                                                 <td><span
                                                         class="badge badge-status badge-status--${fn:toLowerCase(donor.account.status.toString())}">${donor.account.status}</span>
                                                 </td>
-                                                <td class="text-muted text-sm">${donor.createdAt != null ?
-                                                    donor.createdAt.toLocalDate() : '—'}</td>
+                                                <td class="text-muted text-sm text-nowrap">${donor.createdAt != null ?
+                                                    donor.createdAt.format(adminDateTimeFormatter) : '—'}</td>
                                                 <td>
                                                     <a href="<c:url value='/admin/donors/${donor.id}'/>"
-                                                        class="btn btn-sm btn-outline">View</a>
+                                                        class="btn btn-sm btn-outline icon-action" title="View donor"
+                                                        aria-label="View donor">
+                                                        <svg viewBox="0 0 24 24">
+                                                            <path
+                                                                d="M12 5c-5 0-9 7-9 7s4 7 9 7 9-7 9-7-4-7-9-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2.2A1.8 1.8 0 1 0 12 10a1.8 1.8 0 0 0 0 3.8z" />
+                                                        </svg>
+                                                    </a>
                                                     <a href="<c:url value='/admin/donors/${donor.id}/edit'/>"
-                                                        class="btn btn-sm btn-outline">Edit</a>
+                                                        class="btn btn-sm btn-primary icon-action" title="Edit donor"
+                                                        aria-label="Edit donor">
+                                                        <svg viewBox="0 0 24 24">
+                                                            <path
+                                                                d="M4 17.3V21h3.7L18.8 9.9l-3.7-3.7L4 17.3zM21.4 6.3a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7 1.8-1.8z" />
+                                                        </svg>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         </c:forEach>

@@ -17,7 +17,7 @@
                 </c:if>
 
                 <div class="card" style="max-width:640px">
-                    <div class="card-header">Hospital Information</div>
+                    <div class="card-header">Hospital Profile</div>
                     <div class="card-body">
                         <form method="post" action="<c:url value='/admin/hospitals/create'/>"
                             enctype="multipart/form-data" novalidate>
@@ -29,6 +29,7 @@
                                 <input type="text" id="name" name="name" value="${fn:escapeXml(hospitalCreateDTO.name)}"
                                     class="form-control" required />
                             </div>
+                            <div class="form-section-heading">Contact Details</div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="phone" class="form-label">Phone <span class="required">*</span></label>
@@ -44,7 +45,7 @@
                             </div>
 
                             <hr class="form-divider" />
-                            <h3 class="form-section-title">Address</h3>
+                            <h3 class="form-section-heading">Location</h3>
 
                             <div class="form-group">
                                 <label for="detailAddress" class="form-label">Street Address <span
@@ -69,13 +70,15 @@
                                 <input type="hidden" name="country" value="Myanmar" />
 
                                 <hr class="form-divider" />
-                                <div class="form-group">
+                                <div class="form-group image-upload-field">
                                     <label for="profilePicture" class="form-label">Profile Picture</label>
                                     <input type="file" id="profilePicture" name="profilePicture"
                                         class="form-control-file" accept="image/*"
                                         data-image-preview-target="profilePicturePreview" />
-                                    <img id="profilePicturePreview" class="preview-image image-preview"
-                                        alt="Selected hospital profile preview" hidden />
+                                    <img id="profilePicturePreview" class="preview-image image-preview" hidden />
+                                    <button type="button" class="image-upload-clear"
+                                        data-image-preview-clear="profilePicture"
+                                        aria-label="Clear hospital profile picture" title="Clear picture">×</button>
                                     <p class="text-muted text-sm mt-1">Upload Size: Max 10MB.</p>
                                 </div>
 

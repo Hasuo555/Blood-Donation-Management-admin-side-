@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.time.format.DateTimeFormatter,java.util.Locale" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<% request.setAttribute("adminDateTimeFormatter", DateTimeFormatter.ofPattern("dd MMM uuuu, hh:mm a", Locale.ENGLISH)); %>
+<% request.setAttribute("adminDateFormatter", DateTimeFormatter.ofPattern("dd MMM uuuu", Locale.ENGLISH)); %>
 <!DOCTYPE html>
 <html lang="en">
 <head>

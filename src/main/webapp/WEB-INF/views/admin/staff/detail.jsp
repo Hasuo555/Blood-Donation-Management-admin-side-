@@ -22,6 +22,14 @@
     <div class="alert alert-error">${fn:escapeXml(errorMessage)}</div>
 </c:if>
 
+<div class="card detail-profile-card mb-4">
+    <div class="detail-profile-avatar">${fn:toUpperCase(fn:substring(staff.name, 0, 1))}</div>
+    <div class="detail-profile-meta">
+        <h2>${fn:escapeXml(staff.name)}</h2>
+        <p>${fn:escapeXml(staff.account.email)}</p>
+    </div>
+</div>
+
 <div class="detail-grid">
     <div class="card">
         <div class="card-header">Account Information</div>
@@ -32,20 +40,20 @@
                 <dt>Account Status</dt>
                 <dd><span class="badge badge-status badge-status--${fn:toLowerCase(staff.account.status.toString())}">${staff.account.status}</span></dd>
                 <dt>Last Login</dt>
-                <dd>${staff.account.lastLoginAt != null ? staff.account.lastLoginAt : '—'}</dd>
+                <dd>${staff.account.lastLoginAt != null ? staff.account.lastLoginAt.format(adminDateTimeFormatter) : '—'}</dd>
             </dl>
         </div>
     </div>
 
     <div class="card">
-        <div class="card-header">Staff Profile</div>
+        <div class="card-header">Contact &amp; Permissions</div>
         <div class="card-body">
             <dl class="detail-list">
                 <dt>Name</dt><dd>${fn:escapeXml(staff.name)}</dd>
                 <dt>Staff Status</dt>
                 <dd><span class="badge badge-status badge-status--${fn:toLowerCase(staff.status.toString())}">${staff.status}</span></dd>
                 <dt>Hospital</dt><dd>${fn:escapeXml(staff.hospital.name)}</dd>
-                <dt>Assigned Since</dt><dd>${staff.createdAt.toLocalDate()}</dd>
+                <dt>Assigned Since</dt><dd>${staff.createdAt != null ? staff.createdAt.format(adminDateTimeFormatter) : '—'}</dd>
             </dl>
         </div>
     </div>

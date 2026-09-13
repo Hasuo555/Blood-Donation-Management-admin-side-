@@ -56,8 +56,8 @@
                                                 <td><span
                                                         class="badge badge-status badge-status--${fn:toLowerCase(r.status.toString())}">${r.status}</span>
                                                 </td>
-                                                <td class="text-muted text-sm">${r.expiresAt != null ?
-                                                    r.expiresAt.toLocalDate() : '—'}</td>
+                                                <td class="text-muted text-sm text-nowrap">${r.expiresAt != null ?
+                                                    r.expiresAt.format(adminDateTimeFormatter) : '—'}</td>
                                                 <td>
                                                     <c:if
                                                         test="${r.status == 'OPEN' || r.status == 'PARTIALLY_FULFILLED'}">
