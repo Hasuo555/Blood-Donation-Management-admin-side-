@@ -5,6 +5,7 @@ import com.amyanhlu.admin.entity.Account;
 import com.amyanhlu.admin.entity.NfcCard;
 import com.amyanhlu.admin.enums.NfcCardStatus;
 import com.amyanhlu.admin.repository.NfcCardRepository;
+import com.amyanhlu.admin.util.HttpRequestUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -48,19 +49,9 @@ public class NfcCardService {
             String newValue = AuditLogDAO.jsonObject("status", String.valueOf(newStatus),
                     "card_uid", card.getCardUid());
             auditLogDAO.insert(adminAccount.getId(), "UPDATE_NFC_STATUS", "nfc_cards",
-                    card.getId(), oldValue, newValue, clientIp(request));
+                    card.getId(), oldValue, newValue, HttpRequestUtils.clientIp(request));
         }
         log.info("NFC card {} status {} → {}", cardId, oldStatus, newStatus);
     }
 
-    private static String clientIp(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
-    }
 }

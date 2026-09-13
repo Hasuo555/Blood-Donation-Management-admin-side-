@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
 <c:set var="pageTitle" value="Article — Edit" scope="request"/>
 <%@ include file="../../layout/header.jsp" %>
 
@@ -35,7 +36,7 @@
             <div class="form-group">
                 <label for="coverImage" class="form-label">Replace Cover Image</label>
                 <c:if test="${not empty article.coverImage}">
-                    <img src="${fn:escapeXml(article.coverImage)}" alt="Current cover"
+                    <img src="<asset:asset-url value="${article.coverImage}"/>" alt="Current cover"
                          class="preview-image mb-2"/>
                 </c:if>
                 <input type="file" id="coverImage" name="coverImage"

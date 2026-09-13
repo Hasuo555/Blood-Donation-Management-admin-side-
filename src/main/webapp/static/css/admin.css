@@ -459,6 +459,7 @@ select.form-control { cursor: pointer; }
     fill: #94a3b8;
 }
 .preview-image { max-width: 180px; border-radius: var(--radius-sm); }
+.image-preview { display: block; margin-top: 10px; max-height: 180px; object-fit: contain; }
 .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 .dropdown-actions { display: flex; gap: 4px; }
 

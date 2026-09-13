@@ -4,6 +4,7 @@ import com.amyanhlu.admin.dao.AuditLogDAO;
 import com.amyanhlu.admin.entity.Account;
 import com.amyanhlu.admin.entity.AuditLog;
 import com.amyanhlu.admin.repository.AuditLogRepository;
+import com.amyanhlu.admin.util.HttpRequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,7 +76,7 @@ public class AuditLogService {
                 entityId != null ? entityId : 0L,
                 oldValue,   // AuditLogDAO normalizes null/blank/non-JSON values before INSERT
                 newValue,
-                getClientIpAddress(request));
+                HttpRequestUtils.clientIp(request));
     }
 
     @Transactional(readOnly = true)
@@ -98,12 +99,4 @@ public class AuditLogService {
                 entityTypeParam, actionParam, startDate, endDate, performerParam, pageable);
     }
 
-    private String getClientIpAddress(HttpServletRequest request) {
-        if (request == null) return null;
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
-    }
 }

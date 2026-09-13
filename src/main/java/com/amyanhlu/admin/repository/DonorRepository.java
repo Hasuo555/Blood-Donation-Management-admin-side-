@@ -24,16 +24,6 @@ public interface DonorRepository extends JpaRepository<Donor, Long> {
 
        @EntityGraph(attributePaths = { "account", "bloodType", "address" })
        @Query("SELECT d FROM Donor d JOIN d.account a " +
-                     "WHERE (:name IS NULL OR LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
-                     "AND (:status IS NULL OR CAST(a.status AS string) = :status) " +
-                     "AND (:bloodTypeId IS NULL OR d.bloodType.id = :bloodTypeId)")
-       Page<Donor> searchDonors(@Param("name") String name,
-                     @Param("status") String status,
-                     @Param("bloodTypeId") Long bloodTypeId,
-                     Pageable pageable);
-
-       @EntityGraph(attributePaths = { "account", "bloodType", "address" })
-       @Query("SELECT d FROM Donor d JOIN d.account a " +
                      "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
                      "OR LOWER(a.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
                      "OR a.phone LIKE CONCAT('%', :keyword, '%')")

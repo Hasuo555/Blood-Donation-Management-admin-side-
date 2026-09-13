@@ -5,7 +5,6 @@ import com.amyanhlu.admin.entity.Account;
 import com.amyanhlu.admin.entity.Donor;
 import com.amyanhlu.admin.enums.AccountStatus;
 import com.amyanhlu.admin.enums.NfcCardStatus;
-import com.amyanhlu.admin.repository.BloodTypeRepository;
 import com.amyanhlu.admin.security.AdminUserDetails;
 import com.amyanhlu.admin.service.DonorService;
 import com.amyanhlu.admin.service.NfcCardService;
@@ -28,14 +27,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class DonorController {
 
     private final DonorService donorService;
-    private final BloodTypeRepository bloodTypeRepository;
     private final NfcCardService nfcCardService;
 
     public DonorController(DonorService donorService,
-                           BloodTypeRepository bloodTypeRepository,
                            NfcCardService nfcCardService) {
         this.donorService = donorService;
-        this.bloodTypeRepository = bloodTypeRepository;
         this.nfcCardService = nfcCardService;
     }
 
@@ -48,7 +44,7 @@ public class DonorController {
         Page<Donor> donorPage = donorService.searchByKeyword(keyword, PageRequest.of(page, 15));
         model.addAttribute("donorPage", donorPage);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
+        model.addAttribute("bloodTypes", donorService.findAllBloodTypes());
         return "admin/donors/list";
     }
 
@@ -56,6 +52,7 @@ public class DonorController {
     public String detail(@PathVariable Long id, HttpServletRequest request, Model model) {
         request.setAttribute("activeMenu", "donors");
         model.addAttribute("donor", donorService.findById(id));
+        model.addAttribute("nrcDocument", donorService.findNrcDocument(id));
         model.addAttribute("nfcCards", nfcCardService.findByDonorId(id));
         model.addAttribute("nfcStatuses", NfcCardStatus.values());
         return "admin/donors/detail";
@@ -66,9 +63,10 @@ public class DonorController {
         request.setAttribute("activeMenu", "donors");
         Donor donor = donorService.findById(id);
         model.addAttribute("donor", donor);
+        model.addAttribute("nrcDocument", donorService.findNrcDocument(id));
         model.addAttribute("donorUpdateDTO", toDto(donor));
         model.addAttribute("accountStatuses", AccountStatus.values());
-        model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
+        model.addAttribute("bloodTypes", donorService.findAllBloodTypes());
         return "admin/donors/edit";
     }
 
@@ -83,9 +81,10 @@ public class DonorController {
         request.setAttribute("activeMenu", "donors");
         if (result.hasErrors()) {
             model.addAttribute("donor", donorService.findById(id));
+            model.addAttribute("nrcDocument", donorService.findNrcDocument(id));
             model.addAttribute("donorUpdateDTO", donorUpdateDTO);
             model.addAttribute("accountStatuses", AccountStatus.values());
-            model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
+            model.addAttribute("bloodTypes", donorService.findAllBloodTypes());
             return "admin/donors/edit";
         }
         try {
@@ -97,9 +96,10 @@ public class DonorController {
             model.addAttribute("errorMessage",
                     ex.getMessage() != null ? ex.getMessage() : "Update failed.");
             model.addAttribute("donor", donorService.findById(id));
+            model.addAttribute("nrcDocument", donorService.findNrcDocument(id));
             model.addAttribute("donorUpdateDTO", donorUpdateDTO);
             model.addAttribute("accountStatuses", AccountStatus.values());
-            model.addAttribute("bloodTypes", bloodTypeRepository.findAll());
+            model.addAttribute("bloodTypes", donorService.findAllBloodTypes());
             return "admin/donors/edit";
         }
     }

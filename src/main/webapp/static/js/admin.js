@@ -1,9 +1,47 @@
 /* ==========================================================
    AMyanHlu Admin — JavaScript
-   Sidebar toggle + alert auto-dismiss
+   Sidebar toggle + alert auto-dismiss + image previews
    ========================================================== */
 
+/**
+ * Render a selected image file into a preview element before upload.
+ * The file remains in the original input and is submitted normally.
+ */
+function previewSelectedImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (!preview) {
+        return;
+    }
+
+    const file = input && input.files ? input.files[0] : null;
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+        preview.removeAttribute('src');
+        preview.hidden = true;
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        preview.src = event.target.result;
+        preview.hidden = false;
+    };
+    reader.onerror = function () {
+        preview.removeAttribute('src');
+        preview.hidden = true;
+    };
+    reader.readAsDataURL(file);
+}
+
+window.previewSelectedImage = previewSelectedImage;
+
 document.addEventListener('DOMContentLoaded', function () {
+
+    // --- Image file previews ---
+    document.querySelectorAll('[data-image-preview-target]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            previewSelectedImage(input, input.dataset.imagePreviewTarget);
+        });
+    });
 
     // --- Sidebar toggle (responsive) ---
     const toggle = document.getElementById('sidebarToggle');

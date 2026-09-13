@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+            <%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
             <c:set var="pageTitle" value="Donors — Detail" scope="request" />
             <%@ include file="../../layout/header.jsp" %>
 
@@ -80,6 +81,35 @@
                                 </dd>
                             </dl>
                         </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">NRC Verification</div>
+                    <div class="card-body">
+                        <c:choose>
+                            <c:when test="${not empty nrcDocument and not empty nrcDocument.frontImage}">
+                                <div class="detail-grid">
+                                    <div>
+                                        <p class="text-muted text-sm">NRC Photo</p>
+                                        <img src="<asset:asset-url value="${nrcDocument.frontImage}"/>"
+                                             alt="NRC photo" class="preview-image"
+                                             style="max-width:320px; max-height:240px; object-fit:contain;"/>
+                                    </div>
+                                    <c:if test="${not empty nrcDocument.backImage}">
+                                        <div>
+                                            <p class="text-muted text-sm">NRC Back Photo</p>
+                                            <img src="<asset:asset-url value="${nrcDocument.backImage}"/>"
+                                                 alt="NRC back photo" class="preview-image"
+                                                 style="max-width:320px; max-height:240px; object-fit:contain;"/>
+                                        </div>
+                                    </c:if>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="badge badge-status badge-status--inactive">No NRC Photo Uploaded</span>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
 

@@ -2,7 +2,6 @@ package com.amyanhlu.admin.servlet;
 
 import com.amyanhlu.admin.dto.DonorCreateDTO;
 import com.amyanhlu.admin.entity.Account;
-import com.amyanhlu.admin.repository.BloodTypeRepository;
 import com.amyanhlu.admin.security.AdminUserDetails;
 import com.amyanhlu.admin.service.DonorService;
 import jakarta.servlet.ServletException;
@@ -43,9 +42,6 @@ public class AdminCreateDonorServlet extends HttpServlet {
     @Autowired
     private DonorService donorService;
 
-    @Autowired
-    private BloodTypeRepository bloodTypeRepository;
-
     @Override
     public void init() {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, getServletContext());
@@ -75,7 +71,7 @@ public class AdminCreateDonorServlet extends HttpServlet {
         if (request.getAttribute("donorCreateDTO") == null) {
             request.setAttribute("donorCreateDTO", new DonorCreateDTO());
         }
-        request.setAttribute("bloodTypes", bloodTypeRepository.findAll());
+        request.setAttribute("bloodTypes", donorService.findAllBloodTypes());
         request.setAttribute("activeMenu", "donors-create");
         request.getRequestDispatcher(VIEW).forward(request, response);
     }
@@ -94,7 +90,7 @@ public class AdminCreateDonorServlet extends HttpServlet {
             request.setAttribute("fieldErrors", fieldErrors);
             request.setAttribute("errorMessage", "Please correct the highlighted fields.");
             request.setAttribute("donorCreateDTO", dto);
-            request.setAttribute("bloodTypes", bloodTypeRepository.findAll());
+            request.setAttribute("bloodTypes", donorService.findAllBloodTypes());
             request.setAttribute("activeMenu", "donors-create");
             request.getRequestDispatcher(VIEW).forward(request, response);
             return;
@@ -116,14 +112,14 @@ public class AdminCreateDonorServlet extends HttpServlet {
         } catch (IllegalArgumentException ex) {
             request.setAttribute("errorMessage", ex.getMessage());
             request.setAttribute("donorCreateDTO", dto);
-            request.setAttribute("bloodTypes", bloodTypeRepository.findAll());
+            request.setAttribute("bloodTypes", donorService.findAllBloodTypes());
             request.setAttribute("activeMenu", "donors-create");
             request.getRequestDispatcher(VIEW).forward(request, response);
         } catch (Exception ex) {
             String msg = ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred.";
             request.setAttribute("errorMessage", "Failed to create donor account: " + msg);
             request.setAttribute("donorCreateDTO", dto);
-            request.setAttribute("bloodTypes", bloodTypeRepository.findAll());
+            request.setAttribute("bloodTypes", donorService.findAllBloodTypes());
             request.setAttribute("activeMenu", "donors-create");
             request.getRequestDispatcher(VIEW).forward(request, response);
         }

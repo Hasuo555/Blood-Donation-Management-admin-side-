@@ -20,8 +20,12 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,35 +45,43 @@ import java.util.UUID;
 public class R2StorageService {
 
     private static final Logger log = LoggerFactory.getLogger(R2StorageService.class);
+    private static final String PLACEHOLDER_URL = "/static/images/placeholder.svg";
 
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg", "image/jpg", "image/png", "image/webp");
 
     private static final long MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024L;
 
-    @Value("${cloudflare.r2.endpoint}")
+    @Value("${R2_ENDPOINT:${cloudflare.r2.endpoint:}}")
     private String endpoint;
 
-    @Value("${cloudflare.r2.access-key}")
+    @Value("${R2_ACCESS_KEY_ID:${cloudflare.r2.access-key:}}")
     private String accessKey;
 
-    @Value("${cloudflare.r2.secret-key}")
+    @Value("${R2_SECRET_ACCESS_KEY:${cloudflare.r2.secret-key:}}")
     private String secretKey;
 
-    @Value("${cloudflare.r2.bucket-name}")
+    @Value("${R2_BUCKET_NAME:${cloudflare.r2.bucket-name:}}")
     private String bucketName;
 
-    @Value("${cloudflare.r2.public-url-prefix}")
+    @Value("${R2_PUBLIC_DOMAIN:${cloudflare.r2.public-url-prefix:}}")
     private String publicUrlPrefix;
 
     private S3Client s3Client;
+    private S3Presigner s3Presigner;
 
     @PostConstruct
     public void init() {
+        if (isBlank(endpoint) || isBlank(accessKey) || isBlank(secretKey) || isBlank(bucketName)) {
+            log.warn("Cloudflare R2 is not configured; media URLs will use the placeholder asset.");
+            return;
+        }
+
         System.setProperty("aws.requestChecksumCalculation", "WHEN_REQUIRED");
         System.setProperty("aws.responseChecksumValidation", "WHEN_REQUIRED");
 
-        s3Client = S3Client.builder()
+        try {
+            s3Client = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)))
@@ -91,14 +103,30 @@ public class R2StorageService {
                         .pathStyleAccessEnabled(true)
                         .checksumValidationEnabled(false)
                         .build())
-                .build();
-        log.info("R2StorageService initialised → bucket={}, endpoint={}", bucketName, endpoint);
+                    .build();
+            s3Presigner = S3Presigner.builder()
+                    .endpointOverride(URI.create(endpoint))
+                    .credentialsProvider(StaticCredentialsProvider.create(
+                            AwsBasicCredentials.create(accessKey, secretKey)))
+                    .region(Region.of("auto"))
+                    .build();
+            log.info("R2StorageService initialised → bucket={}, endpoint={}", bucketName, endpoint);
+        } catch (RuntimeException ex) {
+            s3Client = null;
+            s3Presigner = null;
+            log.error("Could not initialise Cloudflare R2; media pages will use the placeholder asset: {}",
+                    ex.getMessage());
+            return;
+        }
     }
 
     @PreDestroy
     public void shutdown() {
         if (s3Client != null) {
             s3Client.close();
+        }
+        if (s3Presigner != null) {
+            s3Presigner.close();
         }
     }
 
@@ -112,6 +140,97 @@ public class R2StorageService {
         }
         String submitted = part.getSubmittedFileName();
         return submitted != null && !submitted.isBlank();
+    }
+
+    /**
+     * Resolve a stored R2 key or URL without allowing storage failures to
+     * break a page render. Private R2 objects are checked and signed; missing
+     * objects and unavailable storage resolve to the local placeholder asset.
+     */
+    public String getPublicOrSignedUrl(String path) {
+        if (isBlank(path)) {
+            return PLACEHOLDER_URL;
+        }
+
+        try {
+            String storedPath = path.trim().replace('\\', '/');
+            String configuredPrefix = trimTrailingSlashes(publicUrlPrefix);
+            if (isAbsoluteUrl(storedPath)
+                    && !(!configuredPrefix.isEmpty() && storedPath.startsWith(configuredPrefix + "/"))) {
+                return storedPath;
+            }
+
+            String cleanKey = extractKey(storedPath);
+            if (cleanKey.isEmpty()) {
+                return PLACEHOLDER_URL;
+            }
+
+            if (s3Presigner != null && !isLocalAssetPath(cleanKey)) {
+                if (s3Client == null || !doesObjectExist(cleanKey)) {
+                    log.warn("R2 object '{}' is unavailable; using the placeholder asset.", cleanKey);
+                    return PLACEHOLDER_URL;
+                }
+                GetObjectRequest getRequest = GetObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(cleanKey)
+                        .build();
+                GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofMinutes(30))
+                        .getObjectRequest(getRequest)
+                        .build();
+                return s3Presigner.presignGetObject(presignRequest).url().toString();
+            }
+
+            String prefix = configuredPrefix;
+            if (isLocalAssetPath(cleanKey)) {
+                return "/" + cleanKey;
+            }
+            return prefix.isEmpty() ? PLACEHOLDER_URL : prefix + "/" + cleanKey;
+        } catch (RuntimeException ex) {
+            log.error("Failed to resolve R2 storage URL for path '{}': {}", path, ex.getMessage());
+            return PLACEHOLDER_URL;
+        }
+    }
+
+    /**
+     * Safely checks object metadata for callers that need an existence check.
+     * Missing objects, invalid keys, unavailable credentials, and transport
+     * failures all return false instead of escaping into a controller render.
+     */
+    public boolean doesObjectExist(String path) {
+        if (isBlank(path) || s3Client == null || isBlank(bucketName)) {
+            return false;
+        }
+        try {
+            String key = extractKey(path.trim());
+            if (key.isEmpty()) {
+                return false;
+            }
+            s3Client.headObject(HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
+            return true;
+        } catch (S3Exception | SdkClientException ex) {
+            log.warn("Could not verify R2 object '{}': {}", path, ex.getMessage());
+            return false;
+        } catch (RuntimeException ex) {
+            log.warn("Unexpected error verifying R2 object '{}': {}", path, ex.getMessage());
+            return false;
+        }
+    }
+
+    private boolean isAbsoluteUrl(String value) {
+        return value.startsWith("http://") || value.startsWith("https://")
+                || value.startsWith("//") || value.startsWith("data:");
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private boolean isLocalAssetPath(String key) {
+        return key.startsWith("static/") || key.startsWith("images/");
     }
 
     public String uploadFile(MultipartFile file, String directory) throws IOException {
@@ -161,7 +280,9 @@ public class R2StorageService {
 
         String resolvedType = resolveContentType(contentType, originalFilename);
         String extension = sanitizeExtension(originalFilename);
-        String key = directory + "/" + UUID.randomUUID() + extension;
+        String normalizedDirectory = normalizeObjectKey(directory);
+        String filename = UUID.randomUUID() + extension;
+        String key = normalizedDirectory.isEmpty() ? filename : normalizedDirectory + "/" + filename;
 
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -194,12 +315,8 @@ public class R2StorageService {
             throw wrapUploadFailure(ex);
         }
 
-        String prefix = publicUrlPrefix == null ? "" : publicUrlPrefix;
-        if (prefix.endsWith("/")) {
-            prefix = prefix.substring(0, prefix.length() - 1);
-        }
-
-        String publicUrl = prefix + "/" + key;
+        String prefix = trimTrailingSlashes(publicUrlPrefix);
+        String publicUrl = prefix.isEmpty() ? "/" + key : prefix + "/" + key;
         log.debug("Uploaded file to R2: key={}, url={}", key, publicUrl);
         return publicUrl;
     }
@@ -324,19 +441,38 @@ public class R2StorageService {
 
     private String extractKey(String keyOrUrl) {
         if (!keyOrUrl.startsWith("http")) {
-            return keyOrUrl;
+            return normalizeObjectKey(keyOrUrl);
         }
-        String prefix = publicUrlPrefix.endsWith("/")
-                ? publicUrlPrefix
-                : publicUrlPrefix + "/";
+        String prefix = trimTrailingSlashes(publicUrlPrefix) + "/";
         if (keyOrUrl.startsWith(prefix)) {
-            return keyOrUrl.substring(prefix.length());
+            return normalizeObjectKey(keyOrUrl.substring(prefix.length()));
         }
         int bucketIndex = keyOrUrl.indexOf("/" + bucketName + "/");
         if (bucketIndex >= 0) {
-            return keyOrUrl.substring(bucketIndex + bucketName.length() + 2);
+            return normalizeObjectKey(keyOrUrl.substring(bucketIndex + bucketName.length() + 2));
         }
         log.warn("Could not extract R2 key from URL '{}', using as-is", keyOrUrl);
         return keyOrUrl;
+    }
+
+    /**
+     * Object keys are persisted and composed in one canonical form so a
+     * caller-provided directory such as "/nrc/" cannot create double slashes.
+     */
+    private String normalizeObjectKey(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        return value.trim()
+                .replace('\\', '/')
+                .replaceAll("/{2,}", "/")
+                .replaceAll("^/+|/+$", "");
+    }
+
+    private String trimTrailingSlashes(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        return value.trim().replaceAll("/+$", "");
     }
 }

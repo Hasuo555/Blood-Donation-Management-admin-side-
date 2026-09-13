@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -47,6 +48,8 @@ public class DonorUpdateDTO {
 
     private String country;
     private Long bloodTypeId;
+    private MultipartFile nrcFront;
+    private MultipartFile nrcBack;
 
     public String getName() {
         return name;
@@ -130,4 +133,10 @@ public class DonorUpdateDTO {
 
     public Long getBloodTypeId() { return bloodTypeId; }
     public void setBloodTypeId(Long bloodTypeId) { this.bloodTypeId = bloodTypeId; }
+
+    public MultipartFile getNrcFront() { return nrcFront; }
+    public void setNrcFront(MultipartFile nrcFront) { this.nrcFront = nrcFront; }
+
+    public MultipartFile getNrcBack() { return nrcBack; }
+    public void setNrcBack(MultipartFile nrcBack) { this.nrcBack = nrcBack; }
 }

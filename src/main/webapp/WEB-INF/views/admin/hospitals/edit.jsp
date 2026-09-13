@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
 <c:set var="pageTitle" value="Hospital — Edit" scope="request"/>
 <%@ include file="../../layout/header.jsp" %>
 
@@ -81,7 +82,7 @@
                 <label for="profilePicture" class="form-label">Update Profile Picture</label>
                 <c:if test="${not empty hospital.profilePicture}">
                     <div class="mb-2">
-                        <img src="${fn:escapeXml(hospital.profilePicture)}" alt="Current photo" class="preview-image"/>
+                        <img src="<asset:asset-url value="${hospital.profilePicture}"/>" alt="Current photo" class="preview-image"/>
                         <p class="text-muted text-sm">Current picture</p>
                     </div>
                 </c:if>

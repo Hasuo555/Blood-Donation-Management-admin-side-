@@ -23,17 +23,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Explicitly wire your custom UserDetailsService
                 .userDetailsService(adminUserDetailsService)
 
-                // 2. Temporarily disable CSRF to isolate form submission issues
+                // Existing admin forms are designed for the current CSRF-disabled deployment.
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                         .requestMatchers("/admin/login", "/admin/login/**").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/uploads/**").permitAll()
                         .requestMatchers("/admin/css/**", "/admin/js/**", "/admin/images/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

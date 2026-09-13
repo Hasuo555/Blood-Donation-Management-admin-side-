@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+            <%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
             <c:set var="pageTitle" value="Hospitals — List" scope="request" />
             <%@ include file="../../layout/header.jsp" %>
 
@@ -44,7 +45,7 @@
                                                 <td>
                                                     <div class="table-name-cell">
                                                         <c:if test="${not empty h.profilePicture}">
-                                                            <img src="${fn:escapeXml(h.profilePicture)}" alt=""
+                                                            <img src="<asset:asset-url value="${h.profilePicture}"/>" alt=""
                                                                 class="table-avatar" />
                                                         </c:if>
                                                         <strong>${fn:escapeXml(h.name)}</strong>

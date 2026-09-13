@@ -50,7 +50,9 @@
                             <div class="form-group">
                                 <label for="coverImage" class="form-label">Cover Image</label>
                                 <input type="file" id="coverImage" name="coverImage" class="form-control-file"
-                                    accept="image/*" />
+                                    accept="image/*" data-image-preview-target="coverImagePreview" />
+                                <img id="coverImagePreview" class="preview-image image-preview"
+                                    alt="Selected article cover preview" hidden />
                                 <p class="text-muted text-sm mt-1">Upload Size: Max 10MB.</p>
                             </div>
 

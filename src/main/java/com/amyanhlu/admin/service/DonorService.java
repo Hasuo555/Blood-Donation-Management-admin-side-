@@ -6,6 +6,7 @@ import com.amyanhlu.admin.dto.DonorCreateDTO;
 import com.amyanhlu.admin.dto.DonorUpdateDTO;
 import com.amyanhlu.admin.entity.Account;
 import com.amyanhlu.admin.entity.Address;
+import com.amyanhlu.admin.entity.BloodType;
 import com.amyanhlu.admin.entity.Donor;
 import com.amyanhlu.admin.entity.NrcDocument;
 import com.amyanhlu.admin.enums.AccountStatus;
@@ -15,6 +16,7 @@ import com.amyanhlu.admin.repository.AddressRepository;
 import com.amyanhlu.admin.repository.BloodTypeRepository;
 import com.amyanhlu.admin.repository.DonorRepository;
 import com.amyanhlu.admin.repository.NrcDocumentRepository;
+import com.amyanhlu.admin.util.HttpRequestUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.mindrot.jbcrypt.BCrypt;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -82,6 +85,16 @@ public class DonorService {
             return donorRepository.findAll(pageable);
         }
         return donorRepository.searchByKeyword(keyword.trim(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BloodType> findAllBloodTypes() {
+        return bloodTypeRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public NrcDocument findNrcDocument(Long donorId) {
+        return nrcDocumentRepository.findByDonorId(donorId).orElse(null);
     }
 
     @Transactional(readOnly = true)
@@ -187,7 +200,7 @@ public class DonorService {
                     "name", cleanName,
                     "phone", cleanPhone);
             auditLogDAO.insert(adminAccount.getId(), "CREATE_DONOR", "donors",
-                    donorId, AuditLogDAO.EMPTY_JSON, newValue, clientIp(request));
+                    donorId, AuditLogDAO.EMPTY_JSON, newValue, HttpRequestUtils.clientIp(request));
         }
 
         log.info("Donor account created: donorId={}, phone={}", donorId, cleanPhone);
@@ -211,7 +224,7 @@ public class DonorService {
             String oldValue = AuditLogDAO.jsonObject("status", String.valueOf(oldStatus));
             String newValue = AuditLogDAO.jsonObject("status", String.valueOf(newStatus));
             auditLogDAO.insert(adminAccount.getId(), "STATUS_CHANGE", "donors",
-                    donorId, oldValue, newValue, clientIp(request));
+                    donorId, oldValue, newValue, HttpRequestUtils.clientIp(request));
         }
 
         // Notify the donor of the status change
@@ -311,15 +324,20 @@ public class DonorService {
 
         donorRepository.save(donor);
 
+        boolean nrcFrontUpdated = updateNrcImage(donorId, dto.getNrcFront(), true);
+        boolean nrcBackUpdated = updateNrcImage(donorId, dto.getNrcBack(), false);
+
         if (adminAccount != null) {
             String newValue = AuditLogDAO.jsonObject(
                     "name", cleanName,
                     "phone", cleanPhone,
                     "email", donorAccount.getEmail(),
                     "status", newStatus.name(),
-                    "gender", gender);
+                    "gender", gender,
+                    "nrcFrontUpdated", String.valueOf(nrcFrontUpdated),
+                    "nrcBackUpdated", String.valueOf(nrcBackUpdated));
             auditLogDAO.insert(adminAccount.getId(), "UPDATE_DONOR", "donors",
-                    donorId, oldValue, newValue, clientIp(request));
+                    donorId, oldValue, newValue, HttpRequestUtils.clientIp(request));
         }
 
         // Notify the donor that their profile was updated
@@ -330,6 +348,41 @@ public class DonorService {
                 "SYSTEM");
 
         log.info("Donor {} updated by admin", donorId);
+    }
+
+    private boolean updateNrcImage(Long donorId, MultipartFile image, boolean front) {
+        if (!r2StorageService.hasContent(image)) {
+            return false;
+        }
+
+        NrcDocument document = nrcDocumentRepository.findByDonorId(donorId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "This donor has no NRC document to update."));
+        r2StorageService.validateImageFile(image);
+
+        String previousUrl = front ? document.getFrontImage() : document.getBackImage();
+        String uploadedUrl = null;
+        try {
+            uploadedUrl = r2StorageService.uploadFile(image, "nrc");
+            if (front) {
+                document.setFrontImage(uploadedUrl);
+            } else {
+                document.setBackImage(uploadedUrl);
+            }
+            nrcDocumentRepository.save(document);
+        } catch (IOException ex) {
+            r2StorageService.deleteFile(uploadedUrl);
+            throw new IllegalStateException("Failed to upload the NRC "
+                    + (front ? "front" : "back") + " photo.", ex);
+        } catch (RuntimeException ex) {
+            r2StorageService.deleteFile(uploadedUrl);
+            throw ex;
+        }
+
+        if (previousUrl != null && !previousUrl.equals(uploadedUrl)) {
+            r2StorageService.deleteFile(previousUrl);
+        }
+        return true;
     }
 
     private AccountStatus parseAccountStatus(String raw) {
@@ -380,17 +433,6 @@ public class DonorService {
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Gender must be MALE, FEMALE, or OTHER.");
         }
-    }
-
-    private static String clientIp(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
     }
 
     private static String trim(String s) {

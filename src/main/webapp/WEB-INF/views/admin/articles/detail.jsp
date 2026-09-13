@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+            <%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
             <c:set var="pageTitle" value="Article — Detail" scope="request" />
             <%@ include file="../../layout/header.jsp" %>
 
@@ -76,7 +77,7 @@
                         <div class="card-body">
                             <c:choose>
                                 <c:when test="${not empty article.coverImage}">
-                                    <img src="${fn:escapeXml(article.coverImage)}" alt="Cover"
+                                    <img src="<asset:asset-url value="${article.coverImage}"/>" alt="Cover"
                                         style="max-width:100%;border-radius:8px" />
                                 </c:when>
                                 <c:otherwise>

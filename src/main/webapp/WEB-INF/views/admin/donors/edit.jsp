@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="asset" tagdir="/WEB-INF/tags" %>
 <c:set var="pageTitle" value="Donors — Edit" scope="request"/>
 <%@ include file="../../layout/header.jsp" %>
 
@@ -19,7 +20,8 @@
 <div class="card" style="max-width:640px">
     <div class="card-header">Donor Information</div>
     <div class="card-body">
-        <form method="post" action="<c:url value='/admin/donors/${donor.id}/edit'/>" novalidate>
+        <form method="post" action="<c:url value='/admin/donors/${donor.id}/edit'/>"
+              enctype="multipart/form-data" novalidate>
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
             <div class="form-group">
@@ -75,6 +77,42 @@
                     </c:forEach>
                 </select>
             </div>
+
+            <hr class="form-divider"/>
+            <h3 class="form-section-title">NRC Photos</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <c:choose>
+                        <c:when test="${not empty nrcDocument and not empty nrcDocument.frontImage}">
+                            <img src="<asset:asset-url value="${nrcDocument.frontImage}"/>"
+                                 alt="Current NRC front photo" class="preview-image"/>
+                            <p class="text-muted text-sm">Current front photo</p>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="text-muted text-sm">No front photo uploaded.</p>
+                        </c:otherwise>
+                    </c:choose>
+                    <label for="nrcFront" class="form-label">Upload front photo</label>
+                    <input type="file" id="nrcFront" name="nrcFront"
+                           class="form-control-file" accept="image/*"/>
+                </div>
+                <div class="form-group">
+                    <c:choose>
+                        <c:when test="${not empty nrcDocument and not empty nrcDocument.backImage}">
+                            <img src="<asset:asset-url value="${nrcDocument.backImage}"/>"
+                                 alt="Current NRC back photo" class="preview-image"/>
+                            <p class="text-muted text-sm">Current back photo</p>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="text-muted text-sm">No back photo uploaded.</p>
+                        </c:otherwise>
+                    </c:choose>
+                    <label for="nrcBack" class="form-label">Upload back photo</label>
+                    <input type="file" id="nrcBack" name="nrcBack"
+                           class="form-control-file" accept="image/*"/>
+                </div>
+            </div>
+            <span class="text-muted text-sm">Leave either field blank to keep that current photo.</span>
 
             <hr class="form-divider"/>
             <h3 class="form-section-title">Address</h3>

@@ -72,7 +72,10 @@
                                 <div class="form-group">
                                     <label for="profilePicture" class="form-label">Profile Picture</label>
                                     <input type="file" id="profilePicture" name="profilePicture"
-                                        class="form-control-file" accept="image/*" />
+                                        class="form-control-file" accept="image/*"
+                                        data-image-preview-target="profilePicturePreview" />
+                                    <img id="profilePicturePreview" class="preview-image image-preview"
+                                        alt="Selected hospital profile preview" hidden />
                                     <p class="text-muted text-sm mt-1">Upload Size: Max 10MB.</p>
                                 </div>
 

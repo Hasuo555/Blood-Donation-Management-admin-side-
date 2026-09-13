@@ -36,15 +36,6 @@ public class AdminUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "No account found with email or phone: " + username));
 
-        System.out.println(">>> LOADED USER: " + account.getEmail() + " | STATUS: " + account.getStatus() + " | ROLE: "
-                + account.getRole());
-        System.out.println(">>> DB HASH: [" + account.getPasswordHash() + "]");
-        System.out.println(
-                ">>> MATCHES admin1234? " + new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
-                        .matches("admin1234", account.getPasswordHash()));
-        System.out.println(">>> GENERATED HASH: "
-                + new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("admin1234"));
-
         // Only ADMIN role accounts are allowed
         if (account.getRole() != Role.ADMIN) {
             throw new UsernameNotFoundException("Account is not an administrator");
